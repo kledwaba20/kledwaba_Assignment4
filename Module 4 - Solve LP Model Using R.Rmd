@@ -1,0 +1,93 @@
+---
+title: '4'
+author: "Khutso Ledwaba"
+date: "2022-09-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tinytex)
+```
+
+```{r}
+#Install and call Lp Solve package to solve the problem
+require("lpSolve")
+install.packages("lpSolve")
+library(lpSolve)
+```
+
+
+$$
+\text{The objective function is to}\\
+max\hspace{.3cm} Z = 420(L1+L2+L3) +360(M1+M2+M3)+300(S1+S2+S3)\\
+\text{subject to}\\
+
+Capacity\hspace{.1cm} constraints\\
+L1+M1+S1 <= 750\\
+L2+M2+S2 <= 900\\
+L3+M3+S3 <= 450\\
+
+Square\hspace{.1cm}\hspace{.1cm} feet\hspace{.1cm} available\hspace{.1cm} constraints\\
+20L1+15M1+12S1 <= 13000\\
+20L2+15M2+12S2 <= 12000\\
+20L3+15M3+12S3 <= 5000\\
+
+Sales\hspace{.1cm} constraints\\
+L1+L2+L3 <= 900\\
+M1+M2+M3 <= 1200\\
+S1+S2+S3 <= 750\\
+
+Excess\hspace{.1cm} capacity\hspace{.1cm} to\hspace{.1cm} produce\hspace{.1cm} the\hspace{.1cm} new\hspace{.1cm} product.\\
+1/750(L1+M1+S1) - 1/900(L2+M2+S2) = 0\\
+
+1/750(L1+M1+S1) – 1/450 (L3+M3+S3) = 0\\
+
+\text{non-negativity of the variables}: x_1,x_2,L_1,L_2,L_3,M_1,M_2,M_3,S_1,S_2,S_3\ge0
+$$
+```{r}
+#objective function.
+f.obj<-c(420,360,300,420,360,300,420,360,300)
+
+#Lp model constraints.
+f.con <- matrix(c(1,1,1,0,0,0,0,0,0,
+                  0,0,0,1,1,1,0,0,0,
+                  0,0,0,0,0,0,1,1,1,
+                  20,15,12,0,0,0,0,0,0,
+                  0,0,0,20,15,12,0,0,0,
+                  0,0,0,0,0,0,20,15,12,
+                  1,0,0,1,0,0,1,0,0,
+                  0,1,0,0,1,0,0,1,0,
+                  0,0,1,0,0,1,0,0,1), nrow = 9, byrow=T)
+
+#direction of the constraints.
+f.dir <- c('<=',
+           '<=',
+           '<=',
+           '<=',
+           '<=',
+           '<=',
+           '<=',
+           '<=',
+           '<=')
+
+#labeling the right hand side values
+f.rhs <- c(750,900,450,13000,12000,5000,900,1200,750)
+```
+
+```{r}
+#Solving the Lp function by calling it using the given information.
+lp('max',f.obj,f.con,f.dir,f.rhs)
+
+```
+
+```{r}
+#Repetition of the previous step to define the values for all the variables.
+lp('max',f.obj,f.con,f.dir,f.rhs)$solution
+```
+
+
+
